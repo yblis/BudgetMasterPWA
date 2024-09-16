@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Budget</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#4a90e2">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Gestionnaire de Budget</h1>
+        </header>
+        <nav>
+            <button class="tab-button active" data-tab="summary-tab">Résumé</button>
+            <button class="tab-button" data-tab="expenses-tab">Dépenses</button>
+            <button class="tab-button" data-tab="categories-tab">Catégories</button>
+            <button class="tab-button" data-tab="settings-tab">Paramètres</button>
+        </nav>
+        <main>
+            <section id="summary-tab" class="tab-content active">
+                <div class="card" id="budget-overview"></div>
+                <div class="card">
+                    <canvas id="expense-chart"></canvas>
+                </div>
+                <div class="card">
+                    <h2>Ajouter une dépense rapide</h2>
+                    <form id="quick-expense-form">
+                        <input type="number" id="quick-expense-amount" placeholder="Montant" required>
+                        <input type="text" id="quick-expense-description" placeholder="Description" required>
+                        <select id="quick-expense-category" required></select>
+                        <input type="date" id="quick-expense-date" required>
+                        <button type="submit">Ajouter</button>
+                    </form>
+                </div>
+                <div class="card" id="recent-expenses"></div>
+            </section>
+            <section id="expenses-tab" class="tab-content">
+                <div class="card">
+                    <h2>Ajouter une dépense fixe</h2>
+                    <form id="expense-form">
+                        <input type="number" id="expense-amount" placeholder="Montant" required>
+                        <input type="text" id="expense-description" placeholder="Description" required>
+                        <select id="expense-category" required></select>
+                        <select id="expense-frequency" required>
+                            <option value="monthly">Mensuel</option>
+                            <option value="bimonthly">Bimensuel</option>
+                        </select>
+                        <input type="date" id="expense-date" required>
+                        <button type="submit">Ajouter</button>
+                    </form>
+                </div>
+                <div class="card" id="fixed-expenses-list"></div>
+            </section>
+            <section id="categories-tab" class="tab-content">
+                <div class="card">
+                    <h2>Ajouter une catégorie</h2>
+                    <form id="category-form">
+                        <input type="text" id="category-name" placeholder="Nom de la catégorie" required>
+                        <button type="submit">Ajouter</button>
+                    </form>
+                </div>
+                <div class="card" id="categories-list"></div>
+            </section>
+            <section id="settings-tab" class="tab-content">
+                <div class="card">
+                    <h2>Ajouter un revenu</h2>
+                    <form id="income-form">
+                        <input type="number" id="income-amount" placeholder="Montant" required>
+                        <input type="text" id="income-description" placeholder="Description" required>
+                        <input type="date" id="income-date" required>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="income-recurring" checked>
+                            <label for="income-recurring">Revenu récurrent</label>
+                        </div>
+                        <button type="submit">Ajouter un revenu</button>
+                    </form>
+                </div>
+                <div class="card" id="income-list"></div>
+            </section>
+        </main>
+    </div>
+    <script src='https://cdn.jsdelivr.net/npm/idb@7/build/umd.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+    <script src="/static/js/app.js" type="module"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('Service Worker enregistré', reg))
+                .catch(err => console.log('Service Worker non enregistré', err));
+        }
+    </script>
+</body>
+</html>
