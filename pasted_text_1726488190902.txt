@@ -1,0 +1,62 @@
+Structure générale :
+
+L'application est divisée en quatre onglets principaux : Résumé, Dépenses, Catégories, et Réglages.
+
+Onglet Résumé (SummaryTab) :
+
+Affiche un aperçu du budget total, des dépenses fixes, des dépenses variables et du budget restant.
+Présente une répartition visuelle des dépenses sous forme de barres de progression.
+Permet d'ajouter rapidement une nouvelle dépense variable.
+Liste les dépenses variables récentes avec la possibilité de les supprimer.
+
+Onglet Dépenses (ExpensesTab) :
+
+Permet d'ajouter des dépenses fixes avec un montant, une description, une catégorie et une fréquence (mensuelle ou bimensuelle).
+Affiche la liste des dépenses fixes existantes avec la possibilité de les supprimer.
+
+Onglet Catégories (CategoriesTab) :
+
+Permet de créer et gérer des catégories de dépenses personnalisées.
+Affiche la liste des catégories existantes avec la possibilité de les supprimer.
+
+Onglet Réglages (SettingsTab) :
+
+Permet d'ajouter et de gérer les sources de revenus.
+Affiche la liste des revenus avec leur montant et leur description.
+
+Fonctionnalités détaillées :
+
+Calcul automatique du budget restant en soustrayant les dépenses fixes et variables du revenu total.
+Possibilité d'ajouter des dépenses variables avec un montant, une description et une date.
+Visualisation de la répartition des dépenses pour une meilleure compréhension de la situation financière.
+Gestion flexible des catégories de dépenses pour une personnalisation accrue.
+Interface utilisateur inspirée du design iOS pour une expérience familière aux utilisateurs d'iPhone.
+
+Gestion des données :
+
+Utilise l'état local React (useState) pour stocker et gérer les données.
+Les données doivent être persistantes entre les sessions via une base de données SQLite locale.
+
+Design et interface utilisateur :
+
+Je veux un design propre, élégant et moderne, inspiré du style iOS.
+L'application doit être une PWA, responsive, et offrir une expérience utilisateur fluide.
+En somme, je veux que le design soit élégant PWA et responsive
+
+Notifications :
+
+Peut-être prévoir la possibilité d'ajouter des notifications pour rappeler des dépenses récurrentes ou informer lorsque le budget restant est faible. notifications natives des PWA
+
+
+Documentations et Support :
+
+Une petite documentation pour les utilisateurs finaux ou un guide rapide pourrait être utile. De plus, une documentation technique pour les développeurs pourrait être ajoutée pour faciliter les futures mises à jour.
+
+Mises à jour futures :
+
+l'application doit être conçue de manière modulaire pour faciliter l'ajout de nouvelles fonctionnalités dans le futur, sans nécessiter de refonte majeure.
+
+Autres :
+
+Pas besoin de synchronisation entre appareils.
+Pas de génération de rapports ou d'analyses approfondies des dépenses."
