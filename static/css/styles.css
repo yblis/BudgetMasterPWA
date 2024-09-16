@@ -29,7 +29,9 @@ body {
 }
 
 header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 30px;
 }
 
@@ -37,6 +39,15 @@ h1 {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--primary-color);
+}
+
+.hamburger-menu {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
 }
 
 nav {
@@ -175,13 +186,35 @@ button:hover {
         font-size: 2rem;
     }
 
+    .hamburger-menu {
+        display: block;
+    }
+
     nav {
-        flex-wrap: wrap;
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background-color: var(--card-background);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    nav.active {
+        display: flex;
     }
 
     .tab-button {
-        flex: 1 0 50%;
-        text-align: center;
+        width: 100%;
+        text-align: left;
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-button:last-child {
+        border-bottom: none;
     }
 
     .grid-container {
@@ -191,16 +224,15 @@ button:hover {
     #expense-chart {
         height: 250px;
     }
+
+    h1 {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
     h1 {
         font-size: 1.8rem;
-    }
-
-    .tab-button {
-        flex: 1 0 100%;
-        padding: 10px;
     }
 
     input, select, button {

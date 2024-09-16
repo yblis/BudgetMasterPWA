@@ -132,6 +132,8 @@ def check_and_send_notifications():
 
         if next_date == today:
             send_notification(f"Recurring Expense: {expense['description']} - {expense['amount']} due today")
+        elif next_date == today + timedelta(days=1):
+            send_notification(f"Upcoming Expense: {expense['description']} - {expense['amount']} due tomorrow")
 
     # Check for low budget alert
     total_income = db.execute('SELECT SUM(amount) as total FROM income').fetchone()['total'] or 0

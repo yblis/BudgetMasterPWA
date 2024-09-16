@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 flask = "^3.0.3"
 pywebpush = "^2.0.0"
+py-vapid = "^1.9.1"
 
 
 [build-system]
