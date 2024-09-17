@@ -28,8 +28,8 @@ export async function getExpenses() {
     return await db.getAll('expenses');
 }
 
-export async function addCategory(name) {
-    await db.add('categories', { name });
+export async function addCategory(name, color) {
+    await db.add('categories', { name, color });
 }
 
 export async function getCategories() {

@@ -28,7 +28,8 @@ def init_db():
         db.execute('''
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE
+                name TEXT NOT NULL UNIQUE,
+                color TEXT NOT NULL DEFAULT '#000000'
             )
         ''')
         db.execute('''

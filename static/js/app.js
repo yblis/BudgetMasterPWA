@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Quick expense form
     document.getElementById('quick-expense-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const amount = document.getElementById('quick-expense-amount').value;
+        const amount = parseFloat(document.getElementById('quick-expense-amount').value);
         const description = document.getElementById('quick-expense-description').value;
         const category = document.getElementById('quick-expense-category').value;
         const date = document.getElementById('quick-expense-date').value || new Date().toISOString().split('T')[0];
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fixed expense form
     document.getElementById('expense-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const amount = document.getElementById('expense-amount').value;
+        const amount = parseFloat(document.getElementById('expense-amount').value);
         const description = document.getElementById('expense-description').value;
         const category = document.getElementById('expense-category').value;
         const frequency = document.getElementById('expense-frequency').value;
@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('category-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('category-name').value;
-        await addCategory(name);
+        const color = document.getElementById('category-color').value;
+        await addCategory(name, color);
         updateUI();
         e.target.reset();
     });
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Income form
     document.getElementById('income-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const amount = document.getElementById('income-amount').value;
+        const amount = parseFloat(document.getElementById('income-amount').value);
         const description = document.getElementById('income-description').value;
         const date = document.getElementById('income-date').value || new Date().toISOString().split('T')[0];
         const isRecurring = document.getElementById('income-recurring').checked;
@@ -85,41 +86,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('quick-expense-date').value = new Date().toISOString().split('T')[0];
     document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
     document.getElementById('income-date').value = new Date().toISOString().split('T')[0];
-});
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration);
-            })
-            .catch(error => {
-                console.log('Service Worker registration failed:', error);
-            });
-    });
-}
-
-// Push Notification Subscription
-async function subscribeToPushNotifications() {
+    // Subscribe to push notifications
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         try {
-            const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: await getVapidPublicKey()
-            });
-            await sendSubscriptionToServer(subscription);
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            await subscribeToPushNotifications(registration);
         } catch (error) {
-            console.error('Failed to subscribe to push notifications:', error);
+            console.error('Error registering service worker:', error);
         }
+    }
+});
+
+async function subscribeToPushNotifications(registration) {
+    try {
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: await getVapidPublicKey()
+        });
+        await sendSubscriptionToServer(subscription);
+    } catch (error) {
+        console.error('Failed to subscribe to push notifications:', error);
     }
 }
 
 async function getVapidPublicKey() {
     const response = await fetch('/api/vapid-public-key');
     const data = await response.json();
-    return data.public_key;
+    return urlBase64ToUint8Array(data.public_key);
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 async function sendSubscriptionToServer(subscription) {
@@ -131,6 +140,3 @@ async function sendSubscriptionToServer(subscription) {
         body: JSON.stringify(subscription),
     });
 }
-
-// Call this function when the user grants permission for notifications
-subscribeToPushNotifications();

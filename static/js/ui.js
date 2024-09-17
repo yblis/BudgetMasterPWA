@@ -14,8 +14,8 @@ export async function updateUI() {
 
     updateBudgetOverview(expenses, income);
     updateExpenseChart(expenses, income);
-    updateRecentExpenses(expenses);
-    updateFixedExpensesList(expenses);
+    updateRecentExpenses(expenses, categories);
+    updateFixedExpensesList(expenses, categories);
     updateCategoriesList(categories);
     updateIncomeList(income);
     updateCategorySelects(categories);
@@ -82,19 +82,24 @@ function updateExpenseChart(expenses, income) {
     });
 }
 
-function updateRecentExpenses(expenses) {
+function updateRecentExpenses(expenses, categories) {
     const recentExpenses = expenses
         .filter(exp => exp.type === 'variable')
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .slice(0, 5);
 
-    const expensesHTML = recentExpenses.map(exp => `
-        <div class="expense-item">
-            <p><strong>${exp.description}</strong> - ${exp.amount} € (${exp.category})</p>
-            <p>Date: ${new Date(exp.date).toLocaleDateString()}</p>
-            <button class="delete-button" onclick="deleteExpense(${exp.id})">Supprimer</button>
-        </div>
-    `).join('');
+    const expensesHTML = recentExpenses.map(exp => {
+        const category = categories.find(cat => cat.name === exp.category);
+        const categoryTag = `<span class="category-tag" style="background-color: ${category ? category.color : '#000000'}">${exp.category}</span>`;
+
+        return `
+            <div class="expense-item">
+                <p><strong>${exp.description}</strong> - ${parseFloat(exp.amount).toFixed(2)} € ${categoryTag}</p>
+                <p>Date: ${new Date(exp.date).toLocaleDateString()}</p>
+                <button class="delete-button" onclick="deleteExpense(${exp.id})">Supprimer</button>
+            </div>
+        `;
+    }).join('');
 
     document.getElementById('recent-expenses').innerHTML = `
         <h2>Dépenses variables récentes</h2>
@@ -102,7 +107,7 @@ function updateRecentExpenses(expenses) {
     `;
 }
 
-function updateFixedExpensesList(expenses) {
+function updateFixedExpensesList(expenses, categories) {
     const fixedExpenses = expenses.filter(exp => exp.type === 'fixed');
 
     const expensesHTML = fixedExpenses.map(exp => {
@@ -113,9 +118,12 @@ function updateFixedExpensesList(expenses) {
             dateInfo = `Deux fois par mois les ${exp.date1} et ${exp.date2}`;
         }
         
+        const category = categories.find(cat => cat.name === exp.category);
+        const categoryTag = `<span class="category-tag" style="background-color: ${category ? category.color : '#000000'}">${exp.category}</span>`;
+
         return `
             <div class="expense-item">
-                <p><strong>${exp.description}</strong> - ${exp.amount} € (${exp.category})</p>
+                <p><strong>${exp.description}</strong> - ${parseFloat(exp.amount).toFixed(2)} € ${categoryTag}</p>
                 <p>Fréquence: ${exp.frequency === 'monthly' ? 'Mensuel' : 'Bimensuel'}</p>
                 <p>${dateInfo}</p>
                 <button class="delete-button" onclick="deleteExpense(${exp.id})">Supprimer</button>
@@ -132,7 +140,7 @@ function updateFixedExpensesList(expenses) {
 function updateCategoriesList(categories) {
     const categoriesHTML = categories.map(cat => `
         <div class="category-item">
-            <p>${cat.name}</p>
+            <span class="category-tag" style="background-color: ${cat.color}">${cat.name}</span>
             <button class="delete-button" onclick="deleteCategory(${cat.id})">Supprimer</button>
         </div>
     `).join('');
@@ -146,7 +154,7 @@ function updateCategoriesList(categories) {
 function updateIncomeList(income) {
     const incomeHTML = income.map(inc => `
         <div class="income-item">
-            <p><strong>${inc.description}</strong> - ${inc.amount} €</p>
+            <p><strong>${inc.description}</strong> - ${parseFloat(inc.amount).toFixed(2)} €</p>
             <p>Date: ${new Date(inc.date).toLocaleDateString()}</p>
             ${inc.isRecurring ? `<p>Récurrent: Chaque mois le ${inc.day}</p>` : ''}
             <button class="delete-button" onclick="deleteIncome(${inc.id})">Supprimer</button>

@@ -52,8 +52,8 @@ def categories():
     db = get_db()
     if request.method == 'POST':
         data = request.json
-        if data and 'name' in data:
-            db.execute('INSERT INTO categories (name) VALUES (?)', (data['name'],))
+        if data and 'name' in data and 'color' in data:
+            db.execute('INSERT INTO categories (name, color) VALUES (?, ?)', (data['name'], data['color']))
             db.commit()
             return jsonify({'status': 'success'}), 201
         else:
@@ -131,9 +131,9 @@ def check_and_send_notifications():
             next_date = min(next_date1, next_date2)
 
         if next_date == today:
-            send_notification(f"Recurring Expense: {expense['description']} - {expense['amount']} due today")
+            send_notification(f"Recurring Expense: {expense['description']} - {expense['amount']} € due today")
         elif next_date == today + timedelta(days=1):
-            send_notification(f"Upcoming Expense: {expense['description']} - {expense['amount']} due tomorrow")
+            send_notification(f"Upcoming Expense: {expense['description']} - {expense['amount']} € due tomorrow")
 
     # Check for low budget alert
     total_income = db.execute('SELECT SUM(amount) as total FROM income').fetchone()['total'] or 0
@@ -141,7 +141,7 @@ def check_and_send_notifications():
     remaining_budget = total_income - total_expenses
 
     if remaining_budget < 0.2 * total_income:  # Alert if less than 20% of income remains
-        send_notification(f"Low Budget Alert: Only {remaining_budget:.2f} remaining")
+        send_notification(f"Low Budget Alert: Only {remaining_budget:.2f} € remaining")
 
 def get_next_occurrence(day):
     today = datetime.now().date()

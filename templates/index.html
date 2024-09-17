@@ -29,7 +29,10 @@
                 <div class="card">
                     <h2>Ajouter une dépense rapide</h2>
                     <form id="quick-expense-form">
-                        <input type="number" id="quick-expense-amount" placeholder="Montant" required>
+                        <div class="input-group">
+                            <input type="text" id="quick-expense-amount" placeholder="Montant" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
                         <input type="text" id="quick-expense-description" placeholder="Description" required>
                         <select id="quick-expense-category" required></select>
                         <input type="date" id="quick-expense-date" required>
@@ -42,7 +45,10 @@
                 <div class="card">
                     <h2>Ajouter une dépense fixe</h2>
                     <form id="expense-form">
-                        <input type="number" id="expense-amount" placeholder="Montant" required>
+                        <div class="input-group">
+                            <input type="text" id="expense-amount" placeholder="Montant" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
                         <input type="text" id="expense-description" placeholder="Description" required>
                         <select id="expense-category" required></select>
                         <select id="expense-frequency" required>
@@ -60,6 +66,7 @@
                     <h2>Ajouter une catégorie</h2>
                     <form id="category-form">
                         <input type="text" id="category-name" placeholder="Nom de la catégorie" required>
+                        <input type="color" id="category-color" value="#000000">
                         <button type="submit">Ajouter</button>
                     </form>
                 </div>
@@ -69,7 +76,10 @@
                 <div class="card">
                     <h2>Ajouter un revenu</h2>
                     <form id="income-form">
-                        <input type="number" id="income-amount" placeholder="Montant" required>
+                        <div class="input-group">
+                            <input type="text" id="income-amount" placeholder="Montant" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
                         <input type="text" id="income-description" placeholder="Description" required>
                         <input type="date" id="income-date" required>
                         <div class="checkbox-container">
