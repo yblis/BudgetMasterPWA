@@ -1,15 +1,17 @@
 import { initDB, addExpense, getExpenses, addCategory, getCategories, addIncome, getIncome } from './db.js';
 import { updateUI, showTab } from './ui.js';
+import { EnvelopeCalculator } from './envelope.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initDB();
     updateUI();
+    new EnvelopeCalculator(); // Initialisation du calculateur d'enveloppe
 
     // Hamburger menu functionality
     const hamburgerMenu = document.getElementById('hamburger-menu');
     const mainNav = document.getElementById('main-nav');
 
-    hamburgerMenu.addEventListener('click', () => {
+    hamburgerMenu?.addEventListener('click', () => {
         mainNav.classList.toggle('active');
     });
 
@@ -20,11 +22,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Tab navigation
+    // Nouvelle implémentation de la navigation par onglets
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
-            showTab(button.dataset.tab);
-            // Close menu after selecting a tab on mobile
+            // Désactiver tous les onglets
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Activer l'onglet cliqué
+            button.classList.add('active');
+            const tabId = button.dataset.tab;
+            const tabContent = document.getElementById(tabId);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
+
+            // Fermer le menu sur mobile
             if (window.innerWidth <= 768) {
                 mainNav.classList.remove('active');
             }
@@ -61,25 +78,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Category form
     document.getElementById('category-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('category-name').value;
-        const color = document.getElementById('category-color').value;
-        await addCategory(name, color);
-        updateUI();
-        e.target.reset();
+        try {
+            const name = document.getElementById('category-name').value;
+            const color = document.getElementById('category-color').value;
+            await addCategory(name, color);
+            updateUI();
+            e.target.reset();
+        } catch (error) {
+            alert(error.message);
+        }
     });
 
     // Income form
+    const incomeTypeSelect = document.getElementById('income-type');
+    const monthlyIncomeOptions = document.getElementById('monthly-income-options');
+    const incomeDayInput = document.getElementById('income-day');
+    const incomeDateInput = document.getElementById('income-date');
+
+    incomeTypeSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'monthly') {
+            monthlyIncomeOptions.style.display = 'block';
+            const currentDate = new Date(incomeDateInput.value);
+            incomeDayInput.value = currentDate.getDate();
+        } else {
+            monthlyIncomeOptions.style.display = 'none';
+        }
+    });
+
     document.getElementById('income-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('income-amount').value);
         const description = document.getElementById('income-description').value;
-        const date = document.getElementById('income-date').value || new Date().toISOString().split('T')[0];
-        const isRecurring = document.getElementById('income-recurring').checked;
-        await addIncome(amount, description, date, isRecurring);
+        const type = document.getElementById('income-type').value;
+        const date = document.getElementById('income-date').value;
+        
+        const incomeData = {
+            amount,
+            description,
+            date,
+            is_recurring: type === 'monthly',
+            frequency: type === 'monthly' ? 'monthly' : null,
+            day: type === 'monthly' ? document.getElementById('income-day').value : null
+        };
+
+        await addIncome(incomeData);
         updateUI();
         e.target.reset();
+        
+        // Réinitialiser les valeurs par défaut
         document.getElementById('income-date').value = new Date().toISOString().split('T')[0];
-        document.getElementById('income-recurring').checked = true;
+        document.getElementById('income-type').value = 'one-time';
+        monthlyIncomeOptions.style.display = 'none';
     });
 
     // Set default dates

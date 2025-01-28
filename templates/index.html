@@ -15,10 +15,41 @@
             <button id="hamburger-menu" class="hamburger-menu">&#9776;</button>
         </header>
         <nav id="main-nav" class="main-nav">
-            <button class="tab-button active" data-tab="summary-tab">Résumé</button>
-            <button class="tab-button" data-tab="expenses-tab">Dépenses</button>
-            <button class="tab-button" data-tab="categories-tab">Catégories</button>
-            <button class="tab-button" data-tab="settings-tab">Paramètres</button>
+            <button class="tab-button active" data-tab="summary-tab">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Résumé
+            </button>
+            <button class="tab-button" data-tab="expenses-tab">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                Dépenses
+            </button>
+            <button class="tab-button" data-tab="categories-tab">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                Catégories
+            </button>
+            <button class="tab-button" data-tab="settings-tab">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                Paramètres
+            </button>
+            <button class="tab-button" data-tab="envelopes-tab">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                Enveloppes
+            </button>
         </nav>
         <main>
             <section id="summary-tab" class="tab-content active">
@@ -64,13 +95,18 @@
             <section id="categories-tab" class="tab-content">
                 <div class="card">
                     <h2>Ajouter une catégorie</h2>
-                    <form id="category-form">
+                    <form id="category-form" class="category-form-container">
                         <input type="text" id="category-name" placeholder="Nom de la catégorie" required>
-                        <input type="color" id="category-color" value="#000000">
+                        <div class="color-selector" id="color-selector">
+                            <!-- Les couleurs seront générées dynamiquement -->
+                        </div>
+                        <input type="hidden" id="category-color" value="#007AFF">
                         <button type="submit">Ajouter</button>
                     </form>
                 </div>
-                <div class="card" id="categories-list"></div>
+                <div class="card">
+                    <div id="categories-list" class="categories-grid"></div>
+                </div>
             </section>
             <section id="settings-tab" class="tab-content">
                 <div class="card">
@@ -81,15 +117,56 @@
                             <span class="currency-symbol">€</span>
                         </div>
                         <input type="text" id="income-description" placeholder="Description" required>
-                        <input type="date" id="income-date" required>
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="income-recurring" checked>
-                            <label for="income-recurring">Revenu récurrent</label>
+                        <div class="input-group">
+                            <select id="income-type" required>
+                                <option value="one-time">Occasionnel</option>
+                                <option value="monthly">Mensuel</option>
+                            </select>
+                        </div>
+                        <div id="income-date-container">
+                            <input type="date" id="income-date" required>
+                            <div id="monthly-income-options" style="display: none;">
+                                <input type="number" id="income-day" min="1" max="31" placeholder="Jour du mois" required>
+                            </div>
                         </div>
                         <button type="submit">Ajouter un revenu</button>
                     </form>
                 </div>
                 <div class="card" id="income-list"></div>
+            </section>
+            <section id="envelopes-tab" class="tab-content">
+                <div class="card">
+                    <h2>Simulation d'enveloppe</h2>
+                    <form id="envelope-form">
+                        <div class="input-group">
+                            <input type="text" id="current-balance" placeholder="Solde actuel" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="next-salary" placeholder="Prochain salaire" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
+                        <input type="date" id="salary-date" required>
+                        <button type="submit">Calculer l'enveloppe</button>
+                    </form>
+                </div>
+                <div class="card" id="envelope-result">
+                    <div id="envelope-chart"></div>
+                    <div id="envelope-details"></div>
+                </div>
+                <div class="card">
+                    <h2>Simulations</h2>
+                    <form id="simulation-form">
+                        <div class="input-group">
+                            <input type="text" id="simulation-amount" placeholder="Montant à simuler" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="currency-symbol">€</span>
+                        </div>
+                        <input type="text" id="simulation-description" placeholder="Description" required>
+                        <input type="date" id="simulation-date" required>
+                        <button type="submit">Ajouter à la simulation</button>
+                    </form>
+                    <div id="simulations-list" class="simulations-container"></div>
+                </div>
             </section>
         </main>
     </div>

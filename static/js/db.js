@@ -1,59 +1,148 @@
 let db;
 
 export async function initDB() {
-    db = await idb.openDB('budgetDB', 1, {
-        upgrade(db) {
-            db.createObjectStore('expenses', { keyPath: 'id', autoIncrement: true });
-            db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
-            db.createObjectStore('income', { keyPath: 'id', autoIncrement: true });
-        },
-    });
+    // Cette fonction reste mais ne fait plus rien car on utilise SQLite
+    return;
 }
 
 export async function addExpense(amount, description, category, type, date, frequency = null, date1 = null, date2 = null) {
-    if (type === 'fixed') {
-        const dateObj = new Date(date);
-        if (frequency === 'monthly') {
-            date1 = dateObj.getDate().toString();
-        } else if (frequency === 'bimonthly') {
-            date1 = dateObj.getDate().toString();
-            // For bimonthly, we'll use the same day for both dates initially
-            date2 = date1;
-        }
-    }
-    await db.add('expenses', { amount, description, category, type, date, frequency, date1, date2 });
+    const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            amount, description, category, type, date, frequency, date1, date2
+        }),
+    });
+    if (!response.ok) throw new Error('Erreur lors de l\'ajout de la dépense');
 }
 
 export async function getExpenses() {
-    return await db.getAll('expenses');
+    const response = await fetch('/api/expenses');
+    if (!response.ok) throw new Error('Erreur lors de la récupération des dépenses');
+    return await response.json();
 }
 
 export async function addCategory(name, color) {
-    await db.add('categories', { name, color });
+    const response = await fetch('/api/categories', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, color }),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || 'Erreur lors de l\'ajout de la catégorie');
+    }
+    return data;
 }
 
 export async function getCategories() {
-    return await db.getAll('categories');
-}
-
-export async function addIncome(amount, description, date, isRecurring = false, frequency = 'monthly') {
-    const dateObj = new Date(date);
-    const day = dateObj.getDate().toString();
-    await db.add('income', { amount, description, date, isRecurring, frequency, day });
-}
-
-export async function getIncome() {
-    return await db.getAll('income');
-}
-
-export async function deleteExpense(id) {
-    await db.delete('expenses', id);
+    const response = await fetch('/api/categories');
+    if (!response.ok) throw new Error('Erreur lors de la récupération des catégories');
+    return await response.json();
 }
 
 export async function deleteCategory(id) {
-    await db.delete('categories', id);
+    const response = await fetch(`/api/categories/${id}`, {
+        method: 'DELETE'
+    });
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Erreur lors de la suppression de la catégorie');
+    }
+}
+
+export async function addIncome({ amount, description, date, is_recurring, frequency, day }) {
+    const response = await fetch('/api/income', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            amount,
+            description,
+            date,
+            is_recurring,
+            frequency,
+            day
+        }),
+    });
+    if (!response.ok) throw new Error('Erreur lors de l\'ajout du revenu');
+}
+
+export async function getIncome() {
+    const response = await fetch('/api/income');
+    if (!response.ok) throw new Error('Erreur lors de la récupération des revenus');
+    return await response.json();
 }
 
 export async function deleteIncome(id) {
-    await db.delete('income', id);
+    const response = await fetch(`/api/income/${id}`, {
+        method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Erreur lors de la suppression du revenu');
+}
+
+export async function deleteExpense(id) {
+    const response = await fetch(`/api/expenses/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Erreur lors de la suppression de la dépense');
+    }
+}
+
+export async function updateExpense(expense) {
+    try {
+        const response = await fetch(`/api/expenses/${expense.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: expense.id,
+                description: expense.description,
+                amount: expense.amount,
+                category: expense.category,
+                frequency: expense.frequency,
+                date1: expense.date1,
+                date2: expense.date2,
+                type: expense.type  // S'assurer que le type est inclus
+            })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Erreur lors de la mise à jour de la dépense');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur détaillée:', error);
+        throw error;
+    }
+}
+
+export async function updateIncome(income) {
+    const response = await fetch(`/api/income/${income.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(income)
+    });
+
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Erreur lors de la mise à jour du revenu');
+    }
 }

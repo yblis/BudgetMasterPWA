@@ -12,6 +12,7 @@ def get_db():
 
 def init_db():
     with sqlite3.connect(DATABASE) as db:
+        db.execute('PRAGMA foreign_keys = ON')  # Activer les clés étrangères
         db.execute('''
             CREATE TABLE IF NOT EXISTS expenses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
