@@ -203,12 +203,49 @@ function updateRecentExpenses(expenses, categories) {
         ` : '<p>Aucune dépense récente</p>'}
     `;
 
-    recentExpensesContainer.innerHTML = tableHTML;
+    const listHTML = `
+        <h2>Dépenses variables récentes</h2>
+        ${recentExpenses.length ? `
+        <div class="expenses-list">
+            ${recentExpenses.map(exp => {
+                const category = categories.find(cat => cat.name === exp.category);
+                
+                return `
+                <div data-id="${exp.id}" class="expenses-list-item">
+                    <div class="item-header">${exp.description}</div>
+                    <div class="item-content">
+                        <span>${parseFloat(exp.amount).toFixed(2)} €</span>
+                        <span class="category-tag" style="background-color: ${category ? category.color : '#000000'}">
+                            ${exp.category}
+                        </span>
+                        <span>${new Date(exp.date).toLocaleDateString()}</span>
+                        <div class="item-actions">
+                            <div class="edit-button" title="Modifier">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </div>
+                            <div class="delete-icon" title="Supprimer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+        ` : '<p>Aucune dépense récente</p>'}
+    `;
+
+    recentExpensesContainer.querySelector('.expenses-table-container').innerHTML = tableHTML;
+    recentExpensesContainer.querySelector('.expenses-list-container').innerHTML = listHTML;
 
     // Ajouter les écouteurs d'événements
     recentExpensesContainer.querySelectorAll('.delete-icon').forEach(icon => {
         icon.addEventListener('click', async (e) => {
-            const row = e.currentTarget.closest('tr');
+            const row = e.currentTarget.closest('[data-id]');
             const expenseId = row.dataset.id;
             if (expenseId && confirm('Voulez-vous vraiment supprimer cette dépense ?')) {
                 try {
@@ -224,7 +261,7 @@ function updateRecentExpenses(expenses, categories) {
 
     recentExpensesContainer.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', (e) => {
-            const row = e.currentTarget.closest('tr');
+            const row = e.currentTarget.closest('[data-id]');
             const expense = recentExpenses.find(exp => exp.id === parseInt(row.dataset.id));
             if (expense) {
                 convertVariableExpenseRowToForm(row, expense, categories);

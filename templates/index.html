@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Gestionnaire de Budget</title>
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="manifest" href="/static/manifest.json">
@@ -11,7 +11,6 @@
 <body>
     <div id="app">
         <header>
-            <h1>Gestionnaire de Budget</h1>
             <button id="hamburger-menu" class="hamburger-menu">&#9776;</button>
         </header>
         <nav id="main-nav" class="main-nav">
@@ -70,7 +69,14 @@
                         <button type="submit">Ajouter</button>
                     </form>
                 </div>
-                <div class="card" id="recent-expenses"></div>
+                <div class="card" id="recent-expenses">
+                    <div class="expenses-table-container">
+                        <!-- Table content will be dynamically inserted here -->
+                    </div>
+                    <div class="expenses-list-container">
+                        <!-- List content will be dynamically inserted here -->
+                    </div>
+                </div>
             </section>
             <section id="expenses-tab" class="tab-content">
                 <div class="card">
@@ -90,7 +96,14 @@
                         <button type="submit">Ajouter</button>
                     </form>
                 </div>
-                <div class="card" id="fixed-expenses-list"></div>
+                <div class="card" id="fixed-expenses-list">
+                    <div class="expenses-table-container">
+                        <!-- Table content will be dynamically inserted here -->
+                    </div>
+                    <div class="expenses-list-container">
+                        <!-- List content will be dynamically inserted here -->
+                    </div>
+                </div>
             </section>
             <section id="categories-tab" class="tab-content">
                 <div class="card">
@@ -132,7 +145,14 @@
                         <button type="submit">Ajouter un revenu</button>
                     </form>
                 </div>
-                <div class="card" id="income-list"></div>
+                <div class="card" id="income-list">
+                    <div class="expenses-table-container">
+                        <!-- Table content will be dynamically inserted here -->
+                    </div>
+                    <div class="expenses-list-container">
+                        <!-- List content will be dynamically inserted here -->
+                    </div>
+                </div>
             </section>
             <section id="envelopes-tab" class="tab-content">
                 <div class="card">
