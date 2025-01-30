@@ -75,22 +75,68 @@ def delete_expense(id):
 def update_expense(id):
     try:
         db = get_db()
+        print("Content-Type:", request.headers.get('Content-Type'))  # Log du Content-Type
+        print("Données brutes:", request.get_data(as_text=True))  # Log des données brutes
         data = request.json
+        print("Données parsées:", data)  # Log des données parsées JSON
         
-        if data['frequency'] == 'monthly':
-            db.execute('''
-                UPDATE expenses 
-                SET amount=?, description=?, category=?, type=?, frequency=?, date1=?, date2=NULL
-                WHERE id=?
-            ''', (data['amount'], data['description'], data['category'],
-                  data['type'], data['frequency'], data['date1'], id))
+        # Vérifier les clés de base requises pour toute dépense
+        base_required_keys = ['amount', 'description', 'category', 'type']
+        missing_keys = [key for key in base_required_keys if key not in data]
+        
+        if missing_keys:
+            return jsonify({
+                'status': 'error',
+                'message': 'Données manquantes dans la requête: ' + ', '.join(missing_keys)
+            }), 400
+        
+        # Récupérer la dépense existante
+        expense = db.execute('SELECT * FROM expenses WHERE id = ?', (id,)).fetchone()
+        if not expense:
+            return jsonify({'status': 'error', 'message': 'Dépense non trouvée'}), 404
+            
+        # Si c'est une dépense fixe, vérifier les champs supplémentaires
+        if data['type'] == 'fixed':
+            if 'frequency' not in data:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Le champ frequency est requis pour les dépenses fixes'
+                }), 400
+            if 'date1' not in data:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Le champ date1 est requis pour les dépenses fixes'
+                }), 400
+            
+            if data['frequency'] == 'monthly':
+                db.execute('''
+                    UPDATE expenses 
+                    SET amount=?, description=?, category=?, type=?, frequency=?, date1=?, date2=NULL
+                    WHERE id=?
+                ''', (data['amount'], data['description'], data['category'],
+                      data['type'], data['frequency'], data['date1'], id))
+            else:
+                # Vérifier si date2 est présent pour les fréquences non mensuelles
+                if 'date2' not in data:
+                    return jsonify({
+                        'status': 'error',
+                        'message': 'Le champ date2 est requis pour les dépenses bimensuelles'
+                    }), 400
+                    
+                db.execute('''
+                    UPDATE expenses 
+                    SET amount=?, description=?, category=?, type=?, frequency=?, date1=?, date2=?
+                    WHERE id=?
+                ''', (data['amount'], data['description'], data['category'],
+                      data['type'], data['frequency'], data['date1'], data['date2'], id))
         else:
+            # Pour les dépenses variables, mettre à jour uniquement les champs de base
             db.execute('''
                 UPDATE expenses 
-                SET amount=?, description=?, category=?, type=?, frequency=?, date1=?, date2=?
+                SET amount=?, description=?, category=?, type=?
                 WHERE id=?
             ''', (data['amount'], data['description'], data['category'],
-                  data['type'], data['frequency'], data['date1'], data['date2'], id))
+                  data['type'], id))
         
         db.commit()
         return jsonify({'status': 'success'}), 200
